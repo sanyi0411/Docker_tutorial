@@ -35,13 +35,30 @@
 $ docker pull nginx
 ```
 - The `nginx` image is now stored locally on your system. This means that if you run `docker run nginx` again, Docker won't need to download the image from Docker Hub. It will use the local copy, making the process faster.
-- To list all locally available images:
+
+## Listing images
+- To list locally available images:
     - The two commands below are aliases
 ```bash
 $ docker images
 $ docker image ls
-REPOSITORY                    TAG       IMAGE ID       CREATED       SIZE
-nginx                         latest    058f4935d1cb   3 days ago    152MB
+REPOSITORY     TAG       IMAGE ID       CREATED       SIZE
+nginx          latest    058f4935d1cb   3 days ago    152MB
+```
+- You can list only specific local images if you specify the repository
+    - Below command only lists images create from `nginx` repositories
+```bash
+$ docker images nginx
+REPOSITORY    TAG                 IMAGE ID            CREATED             SIZE
+nginx         1.28.1              308e519aac60        6 days ago          149 MB
+nginx         1.29.4              493d82594c15        3 months ago        152 MB
+nginx         latest              058f4935d1cb        5 months ago        152 MB
+```
+- You can further narrow the list if specify the repostiory and also the tag:
+```bash
+$ docker images nginx:1.29.4
+REPOSITORY    TAG                 IMAGE ID            CREATED             SIZE
+nginx         1.29.4              493d82594c15        3 months ago        152 MB
 ```
 
 ## Creating a container
@@ -70,7 +87,7 @@ $ docker ps -a
 - You have to have an existing container to start
 - You can start a container that has been created but never run
 - Or you can start a container that previously run but has been stopped
-- You can reference a container by it's ID or it's NAME
+- You can reference a container by it's `CONTAINER ID` or it's `NAME`
 ```bash
 $ docker start <CONTAINER ID>
 $ docker start 81fc63386db6
@@ -106,6 +123,7 @@ $ docker run -it ubuntu /bin/bash
 
 ## List containers
 - To list locally running containers:
+    - By default it only lists running containers
 ```bash
 $ docker ps
 CONTAINER ID   IMAGE     COMMAND                  CREATED         STATUS         PORTS     NAMES
@@ -123,18 +141,26 @@ a5c8b09781a5   nginx               "/docker-entrypoint.…"   8 minutes ago     
 
 ## Stopping a container
 - You can stop a running container:
+    - You can reference a container by it's `CONTAINER ID` or it's `NAME` 
 ```bash
 $ docker stop nginx-detached
 ```
 
 ## Restarting a container
 - You can restart a running container
+    - You can reference a container by it's `CONTAINER ID` or it's `NAME`
 ```bash
 $ docker restart nginx-detached
 ```
 
 ## Removing a container
 - To remove a container from your system:
+    - You can reference a container by it's `CONTAINER ID` or it's `NAME`
+    - Below commands are aliases
+```bash
+$ docker rm <CONTAINER ID or NAME>
+$ docker container rm <CONTAINER ID or NAME>
+$ docker container remove <CONTAINER ID or NAME>
 ```bash
 $ docker rm nginx-detached
 ```
@@ -155,4 +181,4 @@ $ docker rmi python:3.7
 Error response from daemon: conflict: unable to remove repository reference "python:3.7" (must force) - container <container_id> is using its referenced image <image_id>
 ```
 - look for the image using `docker ps -a`
-- and delete the container using `docker rm <container_id>`
+- and delete the container using `docker rm <CONTAINER ID or NAME>`
