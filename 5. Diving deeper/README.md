@@ -1,4 +1,4 @@
-# Next steps
+# Diving deeper
 
 ## See image layers
 - Docker images are built using a layered filesystem
@@ -68,4 +68,44 @@ $ docker inspect -f '{{.State.Status}}' nginx-detached
 - You can get certain details with different commands
 ```bash
 $ docker port nginx-detached
+```
+
+## Port mapping
+- In general port mapping (or port forwarding) is an application of Network Address Translation (NAT). It redirects communication coming to a specific port on the router's public IP to a designated device and port on the private internal network.
+![port-forwarding](images/port-forwarding.svg)
+- In Docker services inside a container are not reachable from the host by default
+- Port mapping allows containers to communicate with the host system or external networks. It maps a port on the host system to a port inside the container. It creates a bridge between a host port and a container port
+![docker-port-mapping](images/docker_port_forwarding.png)
+- By default there are no ports mapped on a container
+- To create a container with port mapping:
+```bash
+$ docker run -p <host_port>:<container_port> <image>
+```
+- Try to create an `nginx` container with port mapping
+    - Use the `-d` option to run the container in the background
+```bash
+$ docker run -d -p 8080:80 nginx
+```
+- What happens now:
+    - Docker allocates a port on the host
+    - Adds iptables (NAT) rules on the host
+    - Forwards incoming traffic: traffic to host port -> container IP and port
+    - Handles return traffic back to the client
+- If you now try to connect to `http://localhost:8080`, it will be forwarded to the containers port 80
+- You can map multiple ports at the same time:
+```bash
+$ docker -d -p 8080:80 -p 8443:443 nginx
+```
+- You can let Docker choose a random port on the host:
+```bash
+$ docker run -p 80 nginx
+1a2b3c4d
+$ docker port 1a2b3c4d
+80/tcp -> 0.0.0.0:49153
+```
+- You can bind a specific host interface to a container port
+    - Following example only allows connection from the localhost
+    - Good for security
+```bash
+$ docker run -d -p 127.0.0.1:8080:80
 ```
