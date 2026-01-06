@@ -1,5 +1,16 @@
 # Diving deeper
 
+## Contents
+[See image layers](#see-image-layers) </br>
+[Searching Docker Hub](#searching-docker-hub) </br>
+[Saving and Loading Docker images](#saving-and-loading-docker-images) </br>
+[Image Tagging](#image-tagging) </br>
+[Inspecting containers](#inspecting-containers) </br>
+[Port mapping](#port-mapping) </br>
+[Logs](#logs) </br>
+[Execute commands in the container](#execute-commands-in-the-container) </br>
+[Volumes](#volumes) </br>
+
 ## See image layers
 - Docker images are built using a layered filesystem
 - Each layer represents a set of filesystem changes, applied to the previous layer
@@ -109,3 +120,65 @@ $ docker port 1a2b3c4d
 ```bash
 $ docker run -d -p 127.0.0.1:8080:80
 ```
+
+## Logs
+- To see the container logs:
+    - You can reference a container by it's `CONTAINER ID` or it's `NAME`
+```bash
+$ docker logs nginx-detached
+```
+- This can be overwhelming. So to see only the end of the logs use the `--tail` option:
+```bash
+$ docker logs --tail 10 nginx-detached
+```
+- To follow the logs in real time use the `-f` or `--follow` option:
+    - This streams new log entries as they come in
+    - Exit the stream by pressing `Ctrl+C`
+```bash
+$ docker logs -f nginx-detached
+```
+- To show the timestamps of the logs as well, use the `-t` or `--timestamps` option
+```bash
+$ docker logs --timestamps nginx-detached
+```
+
+## Execute commands in the container
+- You can execute command in a running container
+- You can use it for debugging and maintenance
+- Below commands are aliases
+```bash
+$ docker container exec <CONTAINER ID or NAME> <command> <arguments>
+$ docker exec <CONTAINER ID or NAME> <command> <arguments>
+```
+
+## Volumes
+- By default data inside a container lives only as long as container lives. If the container exits, crashes or stopped, the data inside is lost.
+- Volumes are persistent data storages for containers, that are outside of the container, meaning they reside on host even after the container was stopped
+- Volumes can be used for storing configuration files for containers
+- Volumes are stored within a directory on the Docker host
+- Volumes are managed by Docker, as opposed to [bind mounts](#bind-mounts)
+- Volumes don't increase the size of the container
+- To create a volume during container creation:
+    - Below commands are equal, but `--mount` is preferred because it is most explicit and supports all the available options
+```bash
+$ docker run --mount type=volume,src=<volume-name>,dst=<mount-path>
+$ docker run --volume <volume-name>:<mount-path>
+```
+```bash
+$ docker run -d --name nginx-volume -p 8081:80 -v ~/home/myuser/nginx-data:/usr/share/nginx/html nginx
+```
+- `-d` run the container is detached mode
+- `--name` name the container `nginx-volume`. If omitted, Docker generates a random name for the container
+- `-v` mounts the `~/home/myuser/nginx-data` directory from the host to the `/usr/share/nginx/html` directory in the container
+    - `/usr/share/nginx/html` is the directory where nginx looks for content to serve
+
+### When to use volumes
+- Use volumes to persist data generated and used by containers
+- Volumes are easier to back up and migrate than [bind mounts](#bind-mounts)
+- Volumes can be managed by Docker CLI and API
+- Volumes work on any OS, Linuxx or Windows
+- Volumes are safer to share among containers
+- Volumes can pre-populated with content
+- Volumes are faster to write to, that to the containers filesystem
+
+## Bind mounts
