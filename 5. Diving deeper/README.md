@@ -10,6 +10,7 @@
 [Logs](#logs) </br>
 [Execute commands in the container](#execute-commands-in-the-container) </br>
 [Volumes](#volumes) </br>
+[Bind mounts](#bind-mounts) </br>
 
 ## See image layers
 - Docker images are built using a layered filesystem
@@ -144,11 +145,30 @@ $ docker logs --timestamps nginx-detached
 
 ## Execute commands in the container
 - You can execute command in a running container
+    - The command only runs while the container's primary process (`PID 1`) is running
 - You can use it for debugging and maintenance
+- The command inherits the environment variables that are set in the container
 - Below commands are aliases
 ```bash
 $ docker container exec <CONTAINER ID or NAME> <command> <arguments>
 $ docker exec <CONTAINER ID or NAME> <command> <arguments>
+```
+- The command will run in the default working directory
+- To create a new directory in the running container:
+    - Use the `-d` option to run the command in the background
+```bash
+$ docker exec -d nginx-detached touch /tmp/mydir
+```
+- To start a new shell in the running container:
+```bash
+$ docker exec -it nginx-detached /bin/bash
+```
+- The new shell will inherit the container's environment variables
+- Use the `-e` or `--env` option to set new variables (or override existing)
+    - Below command first adds two new environment variables
+    - Then the `env` command will list all environment variables, includin the new ones
+```bash
+$ docker exec -e VAR_A=1 -e VAR_B=1 nginx-detached env
 ```
 
 ## Volumes
