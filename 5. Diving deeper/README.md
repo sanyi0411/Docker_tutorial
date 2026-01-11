@@ -173,11 +173,15 @@ $ docker exec -e VAR_A=1 -e VAR_B=1 nginx-detached env
 
 ## Volumes
 - By default data inside a container lives only as long as container lives. If the container exits, crashes or stopped, the data inside is lost.
-- Volumes are persistent data storages for containers, that are outside of the container, meaning they reside on host even after the container was stopped
-- Volumes can be used for storing configuration files for containers
-- Volumes are stored within a directory on the Docker host
+- Volumes are persistent data storages for containers, that are outside of the container, meaning they reside on the host even after the container was stopped or removed
+- Volumes can even be used for storing configuration files for containers
+- Volumes are stored within a directory on the Docker host and this directory gets mounted into the container
 - Volumes are managed by Docker, as opposed to [bind mounts](#bind-mounts)
+    - Bind mounts are dependent on the directory structure and OS of the host machine
+- A volume can be mounted into multiple containers simultaneously
+    - Volumes are not removed automatically when they are not used. You have remove them manually
 - Volumes don't increase the size of the container
+
 - To create a volume during container creation:
     - Below commands are equal, but `--mount` is preferred because it is most explicit and supports all the available options
 ```bash
@@ -196,9 +200,19 @@ $ docker run -d --name nginx-volume -p 8081:80 -v ~/home/myuser/nginx-data:/usr/
 - Use volumes to persist data generated and used by containers
 - Volumes are easier to back up and migrate than [bind mounts](#bind-mounts)
 - Volumes can be managed by Docker CLI and API
-- Volumes work on any OS, Linuxx or Windows
+- Volumes work on any OS, Linux or Windows
 - Volumes are safer to share among containers
-- Volumes can pre-populated with content
-- Volumes are faster to write to, that to the containers filesystem
+- Volumes can be pre-populated with content
+- Volumes are faster to write to, than to the container's filesystem
+
+### Mounting over existing data
+- Mounting an empty volume:
+    - If you mount an empty volume into a directory on the container that has pre-existing files or directories in it, then these files or directories will be copied into the volume by default
+    - If you start a container and specify a volume that does not exist yet, an empty volume will be created
+    - Using the above two steps you can create a volume that is pre-populated with data for the container
+
+- Mounting a non-empty volume
+    - If you mount a non-empty volume into a directory on the container that has pre-existing files or directories in it, then these files or directories will be hidden (obscured) by the files in the volume
+    - After removing the volume, the pre-existing files will be available again
 
 ## Bind mounts
